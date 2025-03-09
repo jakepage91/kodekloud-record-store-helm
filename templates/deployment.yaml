@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kodekloud-record-store
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: kodekloud-record-store
+  template:
+    metadata:
+      labels:
+        app: kodekloud-record-store
+    spec:
+      containers:
+        - name: kodekloud-record-store
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+          env:
+            - name: POSTGRES_HOST
+              value: "{{ .Values.postgresql.fullnameOverride }}"
+            - name: POSTGRES_DB
+              value: "{{ .Values.postgresql.auth.database }}"
+            - name: POSTGRES_USER
+              value: "{{ .Values.postgresql.auth.username }}"
+            - name: POSTGRES_PASSWORD
+              value: "{{ .Values.postgresql.auth.password }}"
+            - name: RABBITMQ_HOST
+              value: "{{ .Values.rabbitmq.fullnameOverride }}"
+            - name: PYTHONPATH
+              value: "/app/src"
+            - name: OTEL_SERVICE_NAME
+              value: "kodekloud-record-store"
+          ports:
+            - containerPort: 8000
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kodekloud-record-store-worker
+spec:
+  replicas: {{ .Values.worker.replicaCount }}
+  selector:
+    matchLabels:
+      app: kodekloud-record-store-worker
+  template:
+    metadata:
+      labels:
+        app: kodekloud-record-store-worker
+    spec:
+      containers:
+        - name: kodekloud-record-store-worker
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+          command: ["celery", "-A", "api.worker", "worker", "--loglevel=info"]
+          env:
+            - name: POSTGRES_HOST
+              value: "{{ .Values.postgresql.fullnameOverride }}"
+            - name: POSTGRES_DB
+              value: "{{ .Values.postgresql.auth.database }}"
+            - name: POSTGRES_USER
+              value: "{{ .Values.postgresql.auth.username }}"
+            - name: POSTGRES_PASSWORD
+              value: "{{ .Values.postgresql.auth.password }}"
+            - name: RABBITMQ_HOST
+              value: "{{ .Values.rabbitmq.fullnameOverride }}"
+            - name: PROMETHEUS_PUSHGATEWAY
+              value: "{{ .Values.pushgateway.fullnameOverride }}:9091"
+            - name: PYTHONPATH
+              value: "/app/src"
+            - name: OTEL_SERVICE_NAME
+              value: "kodekloud-record-store-worker"
+          resources:
+            {{- toYaml .Values.worker.resources | nindent 12 }}

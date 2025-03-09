@@ -1,0 +1,29 @@
+apiVersion: v2
+name: kodekloud-record-store
+description: A Helm chart for KodeKloud Record Store
+
+type: application
+version: 0.1.0
+appVersion: "1.16.0"
+
+dependencies:
+  - name: postgresql
+    version: "~12.1.5"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+  - name: rabbitmq
+    version: "~11.9.0"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: rabbitmq.enabled
+  - name: prometheus
+    version: "~19.6.0"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: prometheus.enabled
+  - name: grafana
+    version: "~6.50.7"
+    repository: "https://grafana.github.io/helm-charts"
+    condition: grafana.enabled
+  - name: jaeger
+    version: "~0.71.0"
+    repository: "https://jaegertracing.github.io/helm-charts"
+    condition: jaeger.enabled

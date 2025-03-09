@@ -1,0 +1,127 @@
+# Default values for kodekloud-record-store.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: jakepage91/kodekloud-record-store
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 8000
+
+# Database configuration
+postgresql:
+  enabled: true
+  fullnameOverride: "kodekloud-record-store-db"
+  auth:
+    username: admin
+    password: password
+    database: kodekloud_records
+  primary:
+    persistence:
+      enabled: true
+      size: 1Gi
+
+# RabbitMQ configuration
+rabbitmq:
+  enabled: true
+  fullnameOverride: "kodekloud-record-store-rabbitmq"
+  auth:
+    username: guest
+    password: guest
+  persistence:
+    enabled: true
+    size: 1Gi
+
+# Monitoring tools
+prometheus:
+  enabled: true
+  fullnameOverride: "kodekloud-record-store-prometheus"
+  server:
+    persistentVolume:
+      enabled: true
+      size: 1Gi
+    configMapOverrideName: prometheus-config
+
+pushgateway:
+  enabled: true
+  fullnameOverride: "kodekloud-record-store-pushgateway"
+
+grafana:
+  enabled: true
+  fullnameOverride: "kodekloud-record-store-grafana"
+  adminUser: admin
+  adminPassword: admin
+  persistence:
+    enabled: true
+    size: 1Gi
+
+# Jaeger for tracing
+jaeger:
+  enabled: true
+  fullnameOverride: "kodekloud-record-store-jaeger"
+  collector:
+    service:
+      otlp:
+        http:
+          enabled: true
+        grpc:
+          enabled: true
+
+# Worker configuration
+worker:
+  enabled: true
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "300m"
+      memory: "256Mi"
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+resources:
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
